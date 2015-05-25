@@ -15,6 +15,14 @@ public class SuperBlock extends Block {
 		this.diskSize = diskSize;
 		this.blockSize = blockSize;
 	}
+	
+	public double getDiskSize() {
+		return this.diskSize;
+	}
+	
+	public double getBlockSize() {
+		return this.blockSize;
+	}
 
 	public void setLocationOfRootDirectory(int blockNumber) {
 		this.locationOfRootDirectory = blockNumber;
@@ -22,5 +30,10 @@ public class SuperBlock extends Block {
 	
 	public int getLocationOfRootDirectory() {
 		return this.locationOfRootDirectory;
+	}
+
+	@Override
+	public String getType() {
+		return "super block";
 	}
 }

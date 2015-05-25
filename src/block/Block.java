@@ -17,4 +17,6 @@ public abstract class Block {
 		return number;
 	}
 	
+	public abstract String getType();
+	
 }

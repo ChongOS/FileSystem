@@ -1,17 +1,22 @@
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.PrintStream;
 import java.util.ArrayList;
 
+import operation.DiskOperation;
+import operation.FileOperation;
 import util.ConvertSize;
+import block.DirectoryDataBlock;
 import block.FreeBlock;
 import block.SuperBlock;
 
-
-
-
 public class FileSystem {
 	
-	private static final double DISK_SIZE = ConvertSize.convertToBit("1G");
+	private static final double DISK_SIZE = ConvertSize.convertToBit("100M");
 	private double blockSize;
-	private Disk disk;
+	private DiskOperation disk;
+	private FileOperation file;
 	
 	public FileSystem(String blockSize) {
 		this.blockSize = ConvertSize.convertToBit(blockSize);
@@ -29,9 +34,27 @@ public class FileSystem {
 			freeblocks.add(fb);
 		}
 		
-		// init disk
-		disk = new Disk(superblock, freeblocks);
+		for(int i=0; i<(int) Math.ceil((numberOfFreeblock+2)/blockSize); i++) {
+			FreeBlock fb = freeblocks.get(i);
+			int x = (int) ((numberOfFreeblock+2) - i*blockSize);
+			for(int n=0; n<x ; n++) {
+				fb.setBlockAsUsed(n);
+			}
+		}
+		
+		
+		// init root directory
+		int blockNumberOfRoot = numberOfFreeblock+1;
+		DirectoryDataBlock root = new DirectoryDataBlock(blockNumberOfRoot);
+		superblock.setLocationOfRootDirectory(blockNumberOfRoot);
+		
+		// init disk operation
+		disk = new DiskOperation(superblock, freeblocks);
+		disk.write(root);
 		System.out.println(disk);
+		
+		// init file operation
+		file = new FileOperation(disk);
 	}
 	
 	public void consistencyCheck() {
@@ -42,10 +65,29 @@ public class FileSystem {
 		
 	}
 	
+	public FileOperation getFileOperation() {
+		return file;
+	}
+	
 	
 	public static void main(String[] args) {
+//		// for set output to file using System.out.println
+//		File file = new File("test.txt");
+//		FileOutputStream fis;
+//		try {
+//			fis = new FileOutputStream(file);
+//			PrintStream out = new PrintStream(fis);
+//			System.setOut(out);
+//		} catch (FileNotFoundException e) {
+//			e.printStackTrace();
+//		}
+		
 		FileSystem fs = new FileSystem("2K");
 		fs.initFileSystem();
+		
+		FileOperation fOperation = fs.getFileOperation();
+		fOperation.createFile("one");
+		fOperation.createFile("two");
 	}
 	
 }

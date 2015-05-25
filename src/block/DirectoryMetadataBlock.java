@@ -1,35 +1,28 @@
 package block;
 
-import java.util.Date;
+import exception.DirectoryNameTooLongException;
 
-import exception.NameTooLongException;
 
-public class DirectoryMetadataBlock extends Block {
-
-	private String name;
-	private Date createdDate;
-	private Date lastModifiedDate;
+public class DirectoryMetadataBlock extends MetadataBlock {
 	
-	public DirectoryMetadataBlock(String name, int number) {
-		super(number);
-		
-		if(name.length() > 32) throw new NameTooLongException();
-		
-		this.name = name;
-		this.createdDate = new Date();
-		this.lastModifiedDate = new Date();
+	private int directoryDataBlockNumber;
+	
+	public DirectoryMetadataBlock(String name, int number) throws DirectoryNameTooLongException {
+		super(name, number);
+		if(name.length() > 32) throw new DirectoryNameTooLongException();
+	}
+
+	public void setDirectoryDataBlockNumber(int number) {
+		this.directoryDataBlockNumber = number;
 	}
 	
-	public String getName() {
-		return name;
+	public int getDirectoryDataBlockNumber() {
+		return this.directoryDataBlockNumber;
 	}
 	
-	public String getCreatedDate() {
-		return createdDate.toString();
-	}
-	
-	public String getLastModifiedDate() {
-		return lastModifiedDate.toString();
+	@Override
+	public String getType() {
+		return "dir. metadata";
 	}
 
 }

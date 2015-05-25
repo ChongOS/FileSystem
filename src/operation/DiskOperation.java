@@ -1,3 +1,4 @@
+package operation;
 
 
 import java.util.ArrayList;
@@ -7,11 +8,11 @@ import block.Block;
 import block.FreeBlock;
 import block.SuperBlock;
 
-public class Disk {
+public class DiskOperation {
 
 	private HashMap<Integer, Block> blocks;
 	
-	public Disk(SuperBlock superblock, ArrayList<FreeBlock> freeblocks) {
+	public DiskOperation(SuperBlock superblock, ArrayList<FreeBlock> freeblocks) {
 		this.blocks = new HashMap<Integer, Block>();
 		this.blocks.put(superblock.getBlockNumber(), superblock);
 		for(FreeBlock fb : freeblocks) {
@@ -19,18 +20,18 @@ public class Disk {
 		}
 	}
 	
-	public void read(int blockNumber) {
-		
+	public Block read(int blockNumber) {
+		return blocks.get(blockNumber);
 	}
 	
-	public void write(int blockNumber, int size) {
-		
+	public void write(Block block) {
+		this.blocks.put(block.getBlockNumber(), block);
 	}
 	
 	public String toString() {
 		String str = "";
 		for(Block b : blocks.values()) {
-			str += "block: " + b.getBlockNumber() + "\tsize: " + b.getClass() + "\n";
+			str += "block: " + b.getBlockNumber() + "\t-> " + b.getType() + "\n";
 		}
 		return str;
 	}
