@@ -23,7 +23,7 @@ public class FileOperation {
 		this.blockSize = ((SuperBlock) disk.read(0)).getBlockSize();
 	}
 	
-	public void createDirectory(String pathname) throws DirectoryNameTooLongException {
+	public void createDirectory(String pathname) {
 		
 	}
 	
@@ -53,10 +53,19 @@ public class FileOperation {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-		
+			
 	}
 	
+	public void writeFile(String name, int size) {
+		operationTime = 0;
+		int useBlock = (int) Math.ceil(size/blockSize);
+		
+		
+			
+	}
+	
+	
+
 	private int findFreeBlockHasEmpty() {
 		int i = 1;
 		while(!((FreeBlock) disk.read(i)).hasEmptyBlock()) {
@@ -67,21 +76,22 @@ public class FileOperation {
 	
 	private int[] getEmptyBlockNumber(int number) {
 		int[] blockNumbers = new int[number];
-		int freeBlockNumber;
-		int oldFreeBlock = -1;
+		int freeBlockNumber = this.findFreeBlockHasEmpty();
+		
+		FreeBlock freeBlock = (FreeBlock) disk.read(freeBlockNumber);
+		operationTime++;
+		System.out.println("readDisk("+freeBlockNumber+")\t-> "+freeBlock.getType());
+	
+		operationTime++;	
+		System.out.println("writeDisk("+freeBlockNumber+")\t-> "+freeBlock.getType());
 		
 		for(int i=0; i<number; i++) {
 			
-			freeBlockNumber = this.findFreeBlockHasEmpty();
-			FreeBlock freeBlock = (FreeBlock) disk.read(freeBlockNumber);
+			freeBlock = (FreeBlock) disk.read(freeBlockNumber);
 			
-			int offset = freeBlock.getBlockEmpty();
-			freeBlock.setBlockAsUsed(offset);
-			disk.write(freeBlock);
-			
-			blockNumbers[i] = (int) ((freeBlockNumber-1)*blockSize + offset);
-			
-			if(freeBlockNumber != oldFreeBlock) {
+			if(!freeBlock.hasEmptyBlock()) {
+				freeBlockNumber = this.findFreeBlockHasEmpty();
+				freeBlock = (FreeBlock) disk.read(freeBlockNumber);
 				operationTime++;
 				System.out.println("readDisk("+freeBlockNumber+")\t-> "+freeBlock.getType());
 			
@@ -89,7 +99,12 @@ public class FileOperation {
 				System.out.println("writeDisk("+freeBlockNumber+")\t-> "+freeBlock.getType());
 			}
 			
-			oldFreeBlock = freeBlockNumber;
+			int offset = freeBlock.getBlockEmpty();
+			freeBlock.setBlockAsUsed(offset);
+			disk.write(freeBlock);
+			
+			blockNumbers[i] = (int) ((freeBlockNumber-1)*blockSize + offset);
+			
 		}
 		
 		return blockNumbers;
@@ -103,7 +118,7 @@ public class FileOperation {
 	}
 	
 	private DirectoryDataBlock getDirectoryDataBlock(int root, String pathname) throws AlreadyExistNameException, FileNotFoundException {
-		String[] path = pathname.split("/");
+		String[] path = pathname.split("\\\\");
 		int dirBlockNumber = root;
 		DirectoryDataBlock currentDirDataBlock = (DirectoryDataBlock) disk.read(dirBlockNumber);
 		for(int i=1; i<path.length-1; i++) {

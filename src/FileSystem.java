@@ -86,8 +86,8 @@ public class FileSystem {
 		fs.initFileSystem();
 		
 		FileOperation fOperation = fs.getFileOperation();
-		fOperation.createFile("one");
-		fOperation.createFile("two");
+		fOperation.createFile("\\one");
+		fOperation.createFile("\\two");
 	}
 	
 }
